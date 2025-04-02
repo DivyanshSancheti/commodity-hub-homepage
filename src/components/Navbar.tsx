@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Menu, X, BarChart2, Users, TrendingUp, LayoutDashboard, LogIn } from 'lucide-react';
+import { Menu, X, BarChart2, Users, TrendingUp, LayoutDashboard, LogIn, Robot } from 'lucide-react';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,7 +13,7 @@ const Navbar = () => {
   
   const navItems = [
     { name: "Dashboard", link: "/dashboard", icon: <LayoutDashboard className="h-4 w-4 mr-2" /> },
-    { name: "Trading", link: "/trading", icon: <TrendingUp className="h-4 w-4 mr-2" /> },
+    { name: "Trading", link: "/trading", icon: <Robot className="h-4 w-4 mr-2" /> },
     { name: "Analytics", link: "/analytics", icon: <BarChart2 className="h-4 w-4 mr-2" /> },
     { name: "Community", link: "/community", icon: <Users className="h-4 w-4 mr-2" /> }
   ];
