@@ -43,12 +43,17 @@ const Navbar = () => {
               <Button 
                 variant="outline" 
                 className="flex items-center ml-4 border-commodity-gold text-commodity-gold hover:bg-commodity-gold hover:text-white"
+                asChild
               >
-                <LogIn className="h-4 w-4 mr-2" />
-                Login
+                <Link to="/auth">
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Login
+                </Link>
               </Button>
-              <Button className="bg-commodity-gold hover:bg-amber-600 text-white">
-                Sign Up
+              <Button className="bg-commodity-gold hover:bg-amber-600 text-white" asChild>
+                <Link to="/auth?signup=true">
+                  Sign Up
+                </Link>
               </Button>
             </div>
           )}
@@ -82,12 +87,20 @@ const Navbar = () => {
             <Button 
               variant="outline" 
               className="w-full flex items-center justify-center border-commodity-gold text-commodity-gold hover:bg-commodity-gold hover:text-white"
+              asChild
             >
-              <LogIn className="h-4 w-4 mr-2" />
-              Login
+              <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                <LogIn className="h-4 w-4 mr-2" />
+                Login
+              </Link>
             </Button>
-            <Button className="w-full bg-commodity-gold hover:bg-amber-600 text-white">
-              Sign Up
+            <Button 
+              className="w-full bg-commodity-gold hover:bg-amber-600 text-white"
+              asChild
+            >
+              <Link to="/auth?signup=true" onClick={() => setIsMenuOpen(false)}>
+                Sign Up
+              </Link>
             </Button>
           </div>
         </div>
