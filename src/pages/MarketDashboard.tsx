@@ -1,14 +1,21 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { cn } from "@/lib/utils";
-import { TrendingUp, TrendingDown, BarChart2, Globe } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart2, Globe, Calendar } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const MarketDashboard = () => {
+  // State for time period selection 
+  const [timePeriod, setTimePeriod] = useState('week');
+  // State for selected commodity to highlight
+  const [selectedCommodity, setSelectedCommodity] = useState('all');
+
   // Mock data for live market prices
   const liveMarketData = [
     { name: 'Gold', price: 2011.25, change: 0.4, unit: 'USD/oz' },
@@ -21,16 +28,38 @@ const MarketDashboard = () => {
     { name: 'Soybeans', price: 1204.50, change: -0.45, unit: 'USc/bu' },
   ];
 
-  // Mock historical data for charts (last 7 days)
-  const historicalData = [
-    { name: 'Day 1', Gold: 2005.40, Oil: 79.10, Silver: 23.55, Copper: 4.10 },
-    { name: 'Day 2', Gold: 2008.75, Oil: 78.85, Silver: 23.62, Copper: 4.08 },
-    { name: 'Day 3', Gold: 2010.20, Oil: 78.60, Silver: 23.70, Copper: 4.07 },
-    { name: 'Day 4', Gold: 2007.50, Oil: 78.40, Silver: 23.65, Copper: 4.06 },
-    { name: 'Day 5', Gold: 2009.80, Oil: 78.75, Silver: 23.72, Copper: 4.04 },
-    { name: 'Day 6', Gold: 2010.90, Oil: 78.30, Silver: 23.75, Copper: 4.02 },
-    { name: 'Day 7', Gold: 2011.25, Oil: 78.42, Silver: 23.76, Copper: 4.05 },
-  ];
+  // Historical data for different time periods
+  const historicalDataByPeriod = {
+    week: [
+      { name: 'Mon', Gold: 2005.40, Oil: 79.10, Silver: 23.55, Copper: 4.10 },
+      { name: 'Tue', Gold: 2008.75, Oil: 78.85, Silver: 23.62, Copper: 4.08 },
+      { name: 'Wed', Gold: 2010.20, Oil: 78.60, Silver: 23.70, Copper: 4.07 },
+      { name: 'Thu', Gold: 2007.50, Oil: 78.40, Silver: 23.65, Copper: 4.06 },
+      { name: 'Fri', Gold: 2009.80, Oil: 78.75, Silver: 23.72, Copper: 4.04 },
+      { name: 'Sat', Gold: 2010.90, Oil: 78.30, Silver: 23.75, Copper: 4.02 },
+      { name: 'Sun', Gold: 2011.25, Oil: 78.42, Silver: 23.76, Copper: 4.05 },
+    ],
+    month: [
+      { name: 'Week 1', Gold: 1985.30, Oil: 77.20, Silver: 22.85, Copper: 3.95 },
+      { name: 'Week 2', Gold: 1992.45, Oil: 77.85, Silver: 23.10, Copper: 4.00 },
+      { name: 'Week 3', Gold: 2001.75, Oil: 78.40, Silver: 23.45, Copper: 4.04 },
+      { name: 'Week 4', Gold: 2011.25, Oil: 78.42, Silver: 23.76, Copper: 4.05 },
+    ],
+    quarter: [
+      { name: 'Jan', Gold: 1950.20, Oil: 75.30, Silver: 22.10, Copper: 3.85 },
+      { name: 'Feb', Gold: 1975.40, Oil: 76.70, Silver: 22.80, Copper: 3.92 },
+      { name: 'Mar', Gold: 2011.25, Oil: 78.42, Silver: 23.76, Copper: 4.05 },
+    ],
+    year: [
+      { name: 'Q1', Gold: 1890.10, Oil: 72.15, Silver: 21.40, Copper: 3.60 },
+      { name: 'Q2', Gold: 1925.60, Oil: 74.80, Silver: 22.20, Copper: 3.75 },
+      { name: 'Q3', Gold: 1965.30, Oil: 76.50, Silver: 22.90, Copper: 3.90 },
+      { name: 'Q4', Gold: 2011.25, Oil: 78.42, Silver: 23.76, Copper: 4.05 },
+    ]
+  };
+
+  // Get the correct historical data based on selected time period
+  const historicalData = historicalDataByPeriod[timePeriod as keyof typeof historicalDataByPeriod];
 
   // Mock news data
   const newsItems = [
@@ -64,12 +93,39 @@ const MarketDashboard = () => {
     },
   ];
 
-  // Chart config
+  // Chart config with more colors
   const chartConfig = {
     Gold: { color: '#F59E0B' }, // gold
     Oil: { color: '#374151' },  // dark gray
     Silver: { color: '#94A3B8' }, // silver
     Copper: { color: '#B45309' }, // copper brown
+  };
+
+  // Time period options
+  const timeOptions = [
+    { value: 'week', label: 'Weekly' },
+    { value: 'month', label: 'Monthly' },
+    { value: 'quarter', label: 'Quarterly' },
+    { value: 'year', label: 'Yearly' },
+  ];
+  
+  // Commodity options
+  const commodityOptions = [
+    { value: 'all', label: 'All Commodities' },
+    { value: 'Gold', label: 'Gold' },
+    { value: 'Oil', label: 'Crude Oil' },
+    { value: 'Silver', label: 'Silver' },
+    { value: 'Copper', label: 'Copper' },
+  ];
+
+  // Handle time period change
+  const handleTimePeriodChange = (value: string) => {
+    setTimePeriod(value);
+  };
+
+  // Handle commodity selection change
+  const handleCommodityChange = (value: string) => {
+    setSelectedCommodity(value);
   };
 
   return (
@@ -105,7 +161,7 @@ const MarketDashboard = () => {
                     <TableCell>
                       <div className={cn(
                         "flex items-center",
-                        item.change >= 0 ? "text-commodity-green" : "text-commodity-red"
+                        item.change >= 0 ? "text-commodity-green text-green-600" : "text-commodity-red text-red-600"
                       )}>
                         {item.change >= 0 ? 
                           <TrendingUp className="h-4 w-4 mr-1" /> : 
@@ -124,13 +180,49 @@ const MarketDashboard = () => {
 
         {/* Historical Data & Charts Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-commodity-blue mb-4 flex items-center">
-            <TrendingUp className="h-5 w-5 mr-2" />
-            Historical Price Trends
-          </h2>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+            <h2 className="text-xl font-semibold text-commodity-blue flex items-center">
+              <TrendingUp className="h-5 w-5 mr-2" />
+              Historical Price Trends
+            </h2>
+            <div className="flex flex-col sm:flex-row gap-3 mt-3 md:mt-0">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-gray-500" />
+                <Select value={timePeriod} onValueChange={handleTimePeriodChange}>
+                  <SelectTrigger className="w-[130px]">
+                    <SelectValue placeholder="Select period" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {timeOptions.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                <BarChart2 className="h-4 w-4 text-gray-500" />
+                <Select value={selectedCommodity} onValueChange={handleCommodityChange}>
+                  <SelectTrigger className="w-[160px]">
+                    <SelectValue placeholder="Select commodity" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {commodityOptions.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">7-Day Price Movement</CardTitle>
+              <CardTitle className="text-lg">
+                {timeOptions.find(o => o.value === timePeriod)?.label} Price Movement
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-80 pt-2">
@@ -141,10 +233,46 @@ const MarketDashboard = () => {
                     <YAxis />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Legend />
-                    <Line type="monotone" dataKey="Gold" stroke="#F59E0B" strokeWidth={2} dot={{ r: 4 }} />
-                    <Line type="monotone" dataKey="Oil" stroke="#374151" strokeWidth={2} dot={{ r: 4 }} />
-                    <Line type="monotone" dataKey="Silver" stroke="#94A3B8" strokeWidth={2} dot={{ r: 4 }} />
-                    <Line type="monotone" dataKey="Copper" stroke="#B45309" strokeWidth={2} dot={{ r: 4 }} />
+                    {(selectedCommodity === 'all' || selectedCommodity === 'Gold') && (
+                      <Line 
+                        type="monotone" 
+                        dataKey="Gold" 
+                        stroke="#F59E0B" 
+                        strokeWidth={selectedCommodity === 'Gold' ? 3 : 2} 
+                        dot={{ r: selectedCommodity === 'Gold' ? 5 : 4 }} 
+                        activeDot={{ r: 8 }}
+                      />
+                    )}
+                    {(selectedCommodity === 'all' || selectedCommodity === 'Oil') && (
+                      <Line 
+                        type="monotone" 
+                        dataKey="Oil" 
+                        stroke="#374151" 
+                        strokeWidth={selectedCommodity === 'Oil' ? 3 : 2} 
+                        dot={{ r: selectedCommodity === 'Oil' ? 5 : 4 }} 
+                        activeDot={{ r: 8 }}
+                      />
+                    )}
+                    {(selectedCommodity === 'all' || selectedCommodity === 'Silver') && (
+                      <Line 
+                        type="monotone" 
+                        dataKey="Silver" 
+                        stroke="#94A3B8" 
+                        strokeWidth={selectedCommodity === 'Silver' ? 3 : 2} 
+                        dot={{ r: selectedCommodity === 'Silver' ? 5 : 4 }} 
+                        activeDot={{ r: 8 }}
+                      />
+                    )}
+                    {(selectedCommodity === 'all' || selectedCommodity === 'Copper') && (
+                      <Line 
+                        type="monotone" 
+                        dataKey="Copper" 
+                        stroke="#B45309" 
+                        strokeWidth={selectedCommodity === 'Copper' ? 3 : 2} 
+                        dot={{ r: selectedCommodity === 'Copper' ? 5 : 4 }} 
+                        activeDot={{ r: 8 }}
+                      />
+                    )}
                   </LineChart>
                 </ChartContainer>
               </div>
